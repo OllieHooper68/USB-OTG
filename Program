@@ -1,0 +1,35 @@
+
+#define RED_LED 6
+#define BLUE_LED 5
+#define GREEN_LED 9
+
+//const int values for colour balance these can be reduced to increase to help colour balance
+const int max_red = 200;
+const int max_green = 90;
+const int max_blue = 100;
+
+byte colors[3] = {0, 0, 0}; //array to replace gBright, rBright, bBright in previous code
+byte lineEnding = 0x0A; //10 in decimal, ASCII newline character
+
+void setup(){
+  //set all three LED pins to output
+  pinMode(RED_LED, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+  pinMode(BLUE_LED, OUTPUT);
+  
+  //start the Serial connection, this comes from the USB OTG
+  Serial.begin(9600);
+}
+
+void loop(){
+  //check that at least 3 bytes are available on the Serial port
+  if (Serial.available() > 2){
+     //store data up until lineEnding (0x0A) in the bytesRead array
+     int bytesRead = Serial.readBytesUntil(lineEnding, (char*)colors, 3);
+  }  
+  //set the three PWM pins according to the data read from the Serial port
+  //we also scale the values with map() so that the R, G, and B brightnesses are balanced.
+  analogWrite(RED_LED, map(colors[0], 0, 255, 0, max_red));
+  analogWrite(GREEN_LED, map(colors[1], 0, 255, 0, max_green));
+  analogWrite(BLUE_LED, map(colors[2], 0, 255, 0, max_blue));
+}
